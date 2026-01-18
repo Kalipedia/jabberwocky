@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Randomized Poem</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Garamond', 'Georgia', serif;
+            background: #1a1a1a;
+            background-image: 
+                radial-gradient(circle at 20% 30%, rgba(139, 0, 0, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 70%, rgba(25, 25, 112, 0.1) 0%, transparent 50%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: linear-gradient(145deg, #2a2a2a, #1f1f1f);
+            padding: 60px 80px;
+            border-radius: 15px;
+            box-shadow: 
+                0 0 40px rgba(139, 0, 0, 0.3),
+                inset 0 0 60px rgba(0, 0, 0, 0.5);
+            max-width: 800px;
+            width: 100%;
+            border: 2px solid #3a3a3a;
+            position: relative;
+        }
+
+        .container::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            background: linear-gradient(45deg, #8b0000, #191970, #8b0000);
+            border-radius: 15px;
+            z-index: -1;
+            opacity: 0.3;
+        }
+
+        h1 {
+            text-align: center;
+            color: #d4af37;
+            margin-bottom: 40px;
+            font-size: 2.5em;
+            letter-spacing: 3px;
+            text-shadow: 
+                2px 2px 4px rgba(0, 0, 0, 0.8),
+                0 0 20px rgba(212, 175, 55, 0.3);
+            font-variant: small-caps;
+        }
+
+        .poem {
+            font-size: 1.3em;
+            line-height: 2;
+            color: #c9c9c9;
+            text-align: center;
+        }
+
+        .poem-line {
+            margin-bottom: 10px;
+        }
+
+        .variable-word {
+            position: relative;
+            display: inline-block;
+            color: #8b0000;
+            font-weight: 500;
+            cursor: help;
+            border-bottom: 2px dotted #8b0000;
+            transition: all 0.3s ease;
+            text-shadow: 0 0 10px rgba(139, 0, 0, 0.4);
+        }
+
+        .variable-word:hover {
+            color: #b22222;
+            border-bottom-color: #b22222;
+            text-shadow: 0 0 15px rgba(178, 34, 34, 0.7);
+        }
+
+        .tooltip {
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%) translateY(-8px);
+            background: linear-gradient(135deg, #2a2a2a, #1a1a1a);
+            color: #d4af37;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 0.7em;
+            white-space: nowrap;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+            z-index: 10;
+            border: 1px solid #8b0000;
+            box-shadow: 0 0 15px rgba(139, 0, 0, 0.5);
+        }
+
+        .tooltip::after {
+            content: '';
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            border: 6px solid transparent;
+            border-top-color: #2a2a2a;
+        }
+
+        .variable-word:hover .tooltip {
+            opacity: 1;
+        }
+
+        .refresh-btn {
+            display: block;
+            margin: 40px auto 0;
+            padding: 12px 30px;
+            background: linear-gradient(135deg, #8b0000, #5a0000);
+            color: #d4af37;
+            border: 2px solid #d4af37;
+            border-radius: 8px;
+            font-size: 1em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 
+                0 4px 20px rgba(139, 0, 0, 0.5),
+                inset 0 0 10px rgba(212, 175, 55, 0.1);
+            font-variant: small-caps;
+            letter-spacing: 2px;
+        }
+
+        .refresh-btn:hover {
+            background: linear-gradient(135deg, #a01010, #6a0000);
+            transform: translateY(-2px);
+            box-shadow: 
+                0 6px 25px rgba(139, 0, 0, 0.7),
+                inset 0 0 15px rgba(212, 175, 55, 0.2);
+        }
+
+        .refresh-btn:active {
+            transform: translateY(0);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>A Poem in Flux</h1>
+        <div class="poem" id="poem"></div>
+        <button class="refresh-btn" onclick="generatePoem()">Generate New Version</button>
+    </div>
+
+    <script>
+        // Database of word variations
+        const wordDatabase = {
+            time: ['morning', 'evening', 'twilight', 'midnight'],
+            color: ['crimson', 'azure', 'golden', 'silver'],
+            emotion: ['joy', 'sorrow', 'wonder', 'longing'],
+            nature: ['ocean', 'mountain', 'forest', 'desert'],
+            movement: ['whispers', 'dances', 'flows', 'trembles'],
+            light: ['gleaming', 'fading', 'shimmering', 'glowing'],
+            sound: ['silent', 'echoing', 'melodious', 'thunderous']
+        };
+
+        // Poem structure with markers for variable positions
+        const poemStructure = [
+            { text: 'In the ', static: true },
+            { key: 'time', static: false },
+            { text: ' light,', static: true },
+            { text: 'Where ', static: true },
+            { key: 'color', static: false },
+            { text: ' skies meet the ', static: true },
+            { key: 'nature', static: false },
+            { text: ' wide,', static: true },
+            { text: 'My heart ', static: true },
+            { key: 'movement', static: false },
+            { text: ' with ', static: true },
+            { key: 'emotion', static: false },
+            { text: ',', static: true },
+            { text: 'As ', static: true },
+            { key: 'light', static: false },
+            { text: ' dreams in ', static: true },
+            { key: 'sound', static: false },
+            { text: ' tide.', static: true }
+        ];
+
+        // Line breaks after certain indices
+        const lineBreaks = [2, 7, 12];
+
+        function getRandomWord(category) {
+            const words = wordDatabase[category];
+            const index = Math.floor(Math.random() * words.length);
+            return { word: words[index], version: index + 1 };
+        }
+
+        function generatePoem() {
+            const poemEl = document.getElementById('poem');
+            let html = '<div class="poem-line">';
+            let partIndex = 0;
+
+            poemStructure.forEach((part, index) => {
+                if (part.static) {
+                    html += part.text;
+                } else {
+                    const { word, version } = getRandomWord(part.key);
+                    html += `<span class="variable-word">${word}<span class="tooltip">Version ${version}</span></span>`;
+                }
+
+                if (lineBreaks.includes(index)) {
+                    html += '</div><div class="poem-line">';
+                }
+            });
+
+            html += '</div>';
+            poemEl.innerHTML = html;
+        }
+
+        // Generate poem on page load
+        generatePoem();
+    </script>
+</body>
+</html>
