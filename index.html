@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Randomized Poem</title>
+    <title>Jabberwocky - Randomized</title>
     <style>
         * {
             margin: 0;
@@ -13,10 +13,7 @@
 
         body {
             font-family: 'Garamond', 'Georgia', serif;
-            background: #1a1a1a;
-            background-image: 
-                radial-gradient(circle at 20% 30%, rgba(139, 0, 0, 0.1) 0%, transparent 50%),
-                radial-gradient(circle at 80% 70%, rgba(25, 25, 112, 0.1) 0%, transparent 50%);
+            background: #ffffff;
             min-height: 100vh;
             display: flex;
             justify-content: center;
@@ -25,69 +22,48 @@
         }
 
         .container {
-            background: linear-gradient(145deg, #2a2a2a, #1f1f1f);
+            background: #ffffff;
             padding: 60px 80px;
             border-radius: 15px;
-            box-shadow: 
-                0 0 40px rgba(139, 0, 0, 0.3),
-                inset 0 0 60px rgba(0, 0, 0, 0.5);
             max-width: 800px;
             width: 100%;
-            border: 2px solid #3a3a3a;
-            position: relative;
         }
 
         .container::before {
-            content: '';
-            position: absolute;
-            top: -2px;
-            left: -2px;
-            right: -2px;
-            bottom: -2px;
-            background: linear-gradient(45deg, #8b0000, #191970, #8b0000);
-            border-radius: 15px;
-            z-index: -1;
-            opacity: 0.3;
+            display: none;
         }
 
         h1 {
             text-align: center;
-            color: #d4af37;
+            color: #2c2c2c;
             margin-bottom: 40px;
-            font-size: 2.5em;
-            letter-spacing: 3px;
-            text-shadow: 
-                2px 2px 4px rgba(0, 0, 0, 0.8),
-                0 0 20px rgba(212, 175, 55, 0.3);
-            font-variant: small-caps;
+            font-size: 2.8em;
+            letter-spacing: 2px;
+            font-family: 'Cinzel', 'Trajan Pro', 'Times New Roman', serif;
+            font-weight: normal;
         }
 
         .poem {
-            font-size: 1.3em;
-            line-height: 2;
-            color: #c9c9c9;
+            font-size: 1.2em;
+            line-height: 1.8;
+            color: #000000;
             text-align: center;
-        }
-
-        .poem-line {
-            margin-bottom: 10px;
+            font-style: normal;
         }
 
         .variable-word {
             position: relative;
             display: inline-block;
-            color: #8b0000;
+            color: #4a5568;
             font-weight: 500;
             cursor: help;
-            border-bottom: 2px dotted #8b0000;
+            border-bottom: 2px dotted #4a5568;
             transition: all 0.3s ease;
-            text-shadow: 0 0 10px rgba(139, 0, 0, 0.4);
         }
 
         .variable-word:hover {
-            color: #b22222;
-            border-bottom-color: #b22222;
-            text-shadow: 0 0 15px rgba(178, 34, 34, 0.7);
+            color: #2d3748;
+            border-bottom-color: #2d3748;
         }
 
         .tooltip {
@@ -95,8 +71,8 @@
             bottom: 100%;
             left: 50%;
             transform: translateX(-50%) translateY(-8px);
-            background: linear-gradient(135deg, #2a2a2a, #1a1a1a);
-            color: #d4af37;
+            background: #2d3748;
+            color: #ffffff;
             padding: 6px 12px;
             border-radius: 6px;
             font-size: 0.7em;
@@ -105,8 +81,6 @@
             pointer-events: none;
             transition: opacity 0.3s ease;
             z-index: 10;
-            border: 1px solid #8b0000;
-            box-shadow: 0 0 15px rgba(139, 0, 0, 0.5);
         }
 
         .tooltip::after {
@@ -116,7 +90,7 @@
             left: 50%;
             transform: translateX(-50%);
             border: 6px solid transparent;
-            border-top-color: #2a2a2a;
+            border-top-color: #2d3748;
         }
 
         .variable-word:hover .tooltip {
@@ -127,26 +101,18 @@
             display: block;
             margin: 40px auto 0;
             padding: 12px 30px;
-            background: linear-gradient(135deg, #8b0000, #5a0000);
-            color: #d4af37;
-            border: 2px solid #d4af37;
+            background: #4a5568;
+            color: #ffffff;
+            border: 2px solid #2d3748;
             border-radius: 8px;
             font-size: 1em;
             cursor: pointer;
             transition: all 0.3s ease;
-            box-shadow: 
-                0 4px 20px rgba(139, 0, 0, 0.5),
-                inset 0 0 10px rgba(212, 175, 55, 0.1);
-            font-variant: small-caps;
-            letter-spacing: 2px;
         }
 
         .refresh-btn:hover {
-            background: linear-gradient(135deg, #a01010, #6a0000);
+            background: #2d3748;
             transform: translateY(-2px);
-            box-shadow: 
-                0 6px 25px rgba(139, 0, 0, 0.7),
-                inset 0 0 15px rgba(212, 175, 55, 0.2);
         }
 
         .refresh-btn:active {
@@ -156,77 +122,185 @@
 </head>
 <body>
     <div class="container">
-        <h1>A Poem in Flux</h1>
+        <h1>Jabberwocky</h1>
         <div class="poem" id="poem"></div>
         <button class="refresh-btn" onclick="generatePoem()">Generate New Version</button>
     </div>
 
     <script>
-        // Database of word variations
         const wordDatabase = {
-            time: ['morning', 'evening', 'twilight', 'midnight'],
-            color: ['crimson', 'azure', 'golden', 'silver'],
-            emotion: ['joy', 'sorrow', 'wonder', 'longing'],
-            nature: ['ocean', 'mountain', 'forest', 'desert'],
-            movement: ['whispers', 'dances', 'flows', 'trembles'],
-            light: ['gleaming', 'fading', 'shimmering', 'glowing'],
-            sound: ['silent', 'echoing', 'melodious', 'thunderous']
+            opening: [
+                { word: "'Twas brillig", info: "(EN) Original" },
+                { word: "'Twas przhisat", info: "(SR) Ivan V. Lalić, 1962" },
+                { word: "'Twas kuvno", info: "(SR) Luka Semenović, 1964" },
+                { word: "'Twas przhno", info: "(SR) Ivana Milankov, 1979" },
+                { word: "Pets-pets zhrzhi", info: "(SR) Svetozar Koljević, 1998" }
+            ],
+            creature1: [
+                { word: "slithy toves", info: "(EN) Original" },
+                { word: "otke tayke", info: "(SR) Ivan V. Lalić, 1962" },
+                { word: "slupki trepi", info: "(SR) Luka Semenović, 1964" },
+                { word: "saviluzavi gushterachi", info: "(SR) Ivana Milankov, 1979" },
+                { word: "sklygave mrushe", info: "(SR) Svetozar Koljević, 1998" }
+            ],
+            action1: [
+                { word: "did gyre and gimble", info: "(EN) Original" },
+                { word: "svrdlukahu sve zhirom", info: "(SR) Ivan V. Lalić, 1962" },
+                { word: "chige, burge", info: "(SR) Luka Semenović, 1964" },
+                { word: "tochkashe and burgashe", info: "(SR) Ivana Milankov, 1979" },
+                { word: "djir za djirom svurdlayu", info: "(SR) Svetozar Koljević, 1998" }
+            ],
+            location1: [
+                { word: "wabe", info: "(EN) Original" },
+                { word: "sjenyavi", info: "(SR) Ivan V. Lalić, 1962" },
+                { word: "shisve", info: "(SR) Luka Semenović, 1964" },
+                { word: "ogradice", info: "(SR) Ivana Milankov, 1979" },
+                { word: "galu", info: "(SR) Svetozar Koljević, 1998" }
+            ],
+            state1: [
+                { word: "All mimsy", info: "(EN) Original" },
+                { word: "A kukushne", info: "(SR) Ivan V. Lalić, 1962" },
+                { word: "Klimyani", info: "(SR) Luka Semenović, 1964" },
+                { word: "Svi tanushadni", info: "(SR) Ivana Milankov, 1979" },
+                { word: "Marsh-stidkaste", info: "(SR) Svetozar Koljević, 1998" }
+            ],
+            creature2: [
+                { word: "borogoves", info: "(EN) Original" },
+                { word: "sharadajke", info: "(SR) Ivan V. Lalić, 1962" },
+                { word: "bagrepi", info: "(SR) Luka Semenović, 1964" },
+                { word: "chuperjachi", info: "(SR) Ivana Milankov, 1979" },
+                { word: "grushe", info: "(SR) Svetozar Koljević, 1998" }
+            ],
+            action2: [
+                { word: "the mome raths outgrabe", info: "(EN) Original" },
+                { word: "hrikali su damuzi jenyavi", info: "(SR) Ivan V. Lalić, 1962" },
+                { word: "dudye pravi tiho zhviksve", info: "(SR) Luka Semenović, 1964" },
+                { word: "zelen-papci lutalice", info: "(SR) Ivana Milankov, 1979" },
+                { word: "bezdom-kurbad na skrichavu zhalu", info: "(SR) Svetozar Koljević, 1998" }
+            ],
+            monster1: [
+                { word: "the Jabberwock", info: "(EN) Original" },
+                { word: "Karazuba", info: "(SR) Ivan V. Lalić, 1962" },
+                { word: "blebale zle", info: "(SR) Luka Semenović, 1964" },
+                { word: "Blablarije zle", info: "(SR) Ivana Milankov, 1979" },
+                { word: "Cvrokotasha", info: "(SR) Svetozar Koljević, 1998" }
+            ],
+            bird: [
+                { word: "Jubjub bird", info: "(EN) Original" },
+                { word: "ptice-jalduzlice", info: "(SR) Ivan V. Lalić, 1962" },
+                { word: "mrakan", info: "(SR) Luka Semenović, 1964" },
+                { word: "Cvrk-ptice Mash-masha", info: "(SR) Svetozar Koljević, 1998" }
+            ],
+            descriptor1: [
+                { word: "frumious Bandersnatch", info: "(EN) Original" },
+                { word: "Grabunyca brudog", info: "(SR) Ivan V. Lalić, 1962" },
+                { word: "Zapeysharen", info: "(SR) Luka Semenović, 1964" },
+                { word: "stresnog Krckana od Manche", info: "(SR) Svetozar Koljević, 1998" }
+            ],
+            weapon: [
+                { word: "vorpal", info: "(EN) Original" },
+                { word: "zvorni", info: "(SR) Ivan V. Lalić, 1962" },
+            ],
+            enemy: [
+                { word: "manxome foe", info: "(EN) Original" },
+                { word: "dushmana zebnog", info: "(SR) Ivan V. Lalić, 1962" },
+                { word: "zmaja koji grska", info: "(SR) Svetozar Koljević, 1998" }
+            ],
+            tree: [
+                { word: "Tumtum tree", info: "(EN) Original" },
+                { word: "golchin-stablom", info: "(SR) Ivan V. Lalić, 1962" },
+                { word: "tmushnoj shumi", info: "(SR) Luka Semenović, 1964" },
+                { word: "tam-tam hladentsa", info: "(SR) Svetozar Koljević, 1998" }
+            ],
+            thought: [
+                { word: "uffish thought", info: "(EN) Original" },
+                { word: "zurno thought", info: "(SR) Ivan V. Lalić, 1962" },
+                { word: "ufski thought", info: "(SR) Luka Semenović, 1964" },
+            ],
+            action3: [
+                { word: "whiffling through", info: "(EN) Original" },
+                { word: "zvenyeche zhurno", info: "(SR) Ivan V. Lalić, 1962" },
+            ],
+            location2: [
+                { word: "tulgey wood", info: "(EN) Original" },
+                { word: "mroznu wood", info: "(SR) Ivan V. Lalić, 1962" },
+                { word: "tmushnoj wood", info: "(SR) Luka Semenović, 1964" },
+                { word: "Magravi wood", info: "(SR) Svetozar Koljević, 1998" }
+            ],
+            weirdness1: [
+                { word: "burbled", info: "(EN) Original" },
+                { word: "grobotche", info: "(SR) Ivan V. Lalić, 1962" },
+                { word: "bru-bru", info: "(SR) Luka Semenović, 1964" },
+            ],
+            exclaim1: [
+                { word: "frabjous day", info: "(EN) Original" },
+            ],
+            exclaim2: [
+                { word: "Callooh", info: "(EN) Original" },
+            ],
+            exclaim3: [
+                { word: "Callay", info: "(EN) Original" },
+            ],
+            laugh: [
+                { word: "chortled", info: "(EN) Original" },
+            ]
         };
-
-        // Poem structure with markers for variable positions
-        const poemStructure = [
-            { text: 'In the ', static: true },
-            { key: 'time', static: false },
-            { text: ' light,', static: true },
-            { text: 'Where ', static: true },
-            { key: 'color', static: false },
-            { text: ' skies meet the ', static: true },
-            { key: 'nature', static: false },
-            { text: ' wide,', static: true },
-            { text: 'My heart ', static: true },
-            { key: 'movement', static: false },
-            { text: ' with ', static: true },
-            { key: 'emotion', static: false },
-            { text: ',', static: true },
-            { text: 'As ', static: true },
-            { key: 'light', static: false },
-            { text: ' dreams in ', static: true },
-            { key: 'sound', static: false },
-            { text: ' tide.', static: true }
-        ];
-
-        // Line breaks after certain indices
-        const lineBreaks = [2, 7, 12];
 
         function getRandomWord(category) {
             const words = wordDatabase[category];
             const index = Math.floor(Math.random() * words.length);
-            return { word: words[index], version: index + 1 };
+            return { word: words[index].word, info: words[index].info };
         }
 
         function generatePoem() {
-            const poemEl = document.getElementById('poem');
-            let html = '<div class="poem-line">';
-            let partIndex = 0;
+            const usedWords = {};
+            
+            const parts = [
+                { key: "opening" }, { text: ", and the " }, { key: "creature1" },
+                { text: "<br>      " }, { key: "action1" }, { text: " in the" }, { key: "location1" },
+                { text: ":<br>" }, { key: "state1" }, { text: " were the " }, { key: "creature2" },
+                { text: ",<br>      And " }, { key: "action2" },
+                { text: ".<br><br>\"Beware " }, { key: "monster1" },
+                { text: ", my son!<br>      The jaws that bite, the claws that catch!<br>Beware the " },
+                { key: "bird" }, { text: ", and shun<br>      The " }, { key: "descriptor1" },
+                { text: "!\"<br><br>He took his " },
+                { key: "weapon" }, { text: " sword in hand;<br>      Long time the " },
+                { key: "enemy" }, { text: " he sought—<br>So rested he by the " },
+                { key: "tree" }, { text: "<br>      And stood awhile in thought.<br><br>And, as in " },
+                { key: "thought" }, { text: " he stood,<br>      The " }, { key: "monster1" },
+                { text: ", with eyes of flame,<br>Came " }, { key: "action3" },
+                { text: " the " }, { key: "location2" },
+                { text: ",<br>      And<br>"} { key: "weirdness1" } {text: "as it came!<br>One, two! One, two! And through and through<br>      The " },
+                { key: "weapon" },
+                { text: " blade went snicker-snack!<br>He left it dead, and with its head<br>      He went galumphing back.<br><br>\"And hast thou slain the " },
+                { key: "monster1" },
+                { text: "?<br>      Come to my arms, my beamish boy!<br>O " },
+                { key: "exclaim1" }, { text: "! " }, { key: "exclaim2" },
+                { text: "! " }, { key: "exclaim3" }, { text: "!\"<br>      He " },
+                { key: "laugh" }, { text: " in his joy.<br><br>" },
+                { key: "opening" }, { text: ", and the " }, { key: "creature1" },
+                { text: "<br>      " }, { key: "action1" }, { text: " " }, { key: "location1" },
+                { text: ":<br>" }, { key: "state1" }, { text: " were the " }, { key: "creature2" },
+                { text: ",<br>      And the " }, { key: "action2" }, { text: "." }
+            ];
 
-            poemStructure.forEach((part, index) => {
-                if (part.static) {
+            let html = "";
+            
+            parts.forEach(part => {
+                if (part.text) {
                     html += part.text;
                 } else {
-                    const { word, version } = getRandomWord(part.key);
-                    html += `<span class="variable-word">${word}<span class="tooltip">Version ${version}</span></span>`;
-                }
-
-                if (lineBreaks.includes(index)) {
-                    html += '</div><div class="poem-line">';
+                    if (!usedWords[part.key]) {
+                        usedWords[part.key] = getRandomWord(part.key);
+                    }
+                    const { word, info } = usedWords[part.key];
+                    html += '<span class="variable-word">' + word + '<span class="tooltip">' + info + '</span></span>';
                 }
             });
 
-            html += '</div>';
-            poemEl.innerHTML = html;
+            document.getElementById("poem").innerHTML = html;
         }
 
-        // Generate poem on page load
         generatePoem();
     </script>
 </body>
